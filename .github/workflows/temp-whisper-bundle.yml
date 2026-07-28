@@ -1,4 +1,4 @@
-name: Temporary Whisper Model Bundle
+name: Temporary Speaker Model Bundle
 
 on:
   pull_request:
@@ -12,19 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Fetch multilingual Whisper base model
+      - name: Fetch public ECAPA speaker-embedding model
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p whisper-model
-          curl -fL --retry 5 --retry-delay 2 \
-            -o whisper-model/ggml-base-q5_1.bin \
-            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base-q5_1.bin
-          sha256sum whisper-model/ggml-base-q5_1.bin > whisper-model/SHA256SUMS
-      - name: Upload model
+          python -m pip install --quiet huggingface_hub
+          python - <<'PY'
+          from huggingface_hub import snapshot_download
+          snapshot_download(
+              repo_id='speechbrain/spkrec-ecapa-voxceleb',
+              local_dir='speaker-model',
+          )
+          PY
+          rm -rf speaker-model/.git speaker-model/.cache
+      - name: Upload speaker model
         uses: actions/upload-artifact@v4
         with:
-          name: whisper-base-q5_1
-          path: whisper-model
+          name: speechbrain-ecapa-voxceleb
+          path: speaker-model
           compression-level: 0
           retention-days: 1
