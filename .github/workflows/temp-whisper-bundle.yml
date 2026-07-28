@@ -19,6 +19,7 @@ jobs:
           git clone --depth 1 https://github.com/ggml-org/whisper.cpp.git
           cmake -S whisper.cpp -B whisper.cpp/build \
             -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
             -DWHISPER_BUILD_EXAMPLES=ON \
             -DWHISPER_BUILD_TESTS=OFF \
             -DWHISPER_BUILD_SERVER=OFF
@@ -33,7 +34,7 @@ jobs:
       - name: Upload bundle
         uses: actions/upload-artifact@v4
         with:
-          name: whisper-linux-small-q5_1
+          name: whisper-linux-small-q5_1-static
           path: whisper-bundle
           compression-level: 0
           retention-days: 1
